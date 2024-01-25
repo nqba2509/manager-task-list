@@ -1,9 +1,9 @@
 "use client";
+import { todo } from "node:test";
 import styles from "./page.module.css";
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 type Todo = {
-  id: number;
   job: string;
   iscompleted: boolean;
   isFocus: boolean;
@@ -12,40 +12,30 @@ type Todo = {
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [job, setJob] = useState<string>("");
+  const [editMode, setEditMode] = useState(false);
+  const [editIndex, setEditIndex] = useState(0);
   const [selectJob, setSelectJob] = useState<string>("all");
 
   const handleAddJob = () => {
-    const newJob = [
-      ...todos,
-      { id: Date.now(), job: job, iscompleted: false, isFocus: false },
-    ];
+    const newJob = [...todos, { job: job, iscompleted: false, isFocus: false }];
     setTodos(newJob);
     setJob("");
   };
 
-  const handleDeleteJob = (id: number) => {
-    let detelejob = [];
-    for (let i = 0; i < todos.length; i++) {
-      if (todos[i].id !== id) {
-        detelejob.push(todos[i]);
-      }
-    }
-    setTodos(detelejob);
-    // setTodos(todos.filter((item) => {
-    //   return item.id !== id
-    // }))
+  const handleDeleteJob = (index: number) => {
+    let updataTodos = [...todos];
+    updataTodos.slice(index, 1);
+    setTodos(updataTodos);
   };
 
-  const handleDone = (id: number) => {
+  const handleDone = (index: number) => {
     const jobDone = [...todos];
     for (let i = 0; i < jobDone.length; i++) {
-      if (id === jobDone[i].id) {
+      if (index === i) {
         jobDone[i] = { ...jobDone[i], iscompleted: true };
       }
     }
     setTodos(jobDone);
-    console.log("job done: ", jobDone);
-    console.log("todos: ", todos);
   };
 
   const handleDeteleDoneJob = () => {
@@ -68,16 +58,30 @@ export default function Home() {
     setTodos(deteleNotDone);
   };
 
-  const handleUpdateJob = (id: Number) => {
-    let newTodos = [...todos];
 
-    for (let i = 0; i < todos.length; i++) {
-      if (todos[i].id === id) {
-        newTodos[i] = { ...newTodos[i], job };
-      }
-    }
-    setTodos(newTodos);
+  const handleShowEdit = (todo: Todo, index: number) => {
+    setJob(todo.job);
+    setEditMode(true);
+    setEditIndex(index);
   };
+
+
+  const handleUpdateJob = () => {
+    let updateTodos = [...todos];
+    updateTodos[editIndex] = { ...updateTodos[editIndex], job: job };
+    setTodos(updateTodos);
+    setJob('')
+    setEditMode(false)
+    setEditIndex(0)
+  };
+
+  const handleCompleteAll = () => {
+    const completeAllJob = [...todos];
+    for(let i = 0; i < completeAllJob.length; i++) {
+      completeAllJob[i] = { ...completeAllJob[i], iscompleted: true };
+    }
+    setTodos(completeAllJob)
+  }
 
   let showJobs = todos;
   if (selectJob === "done") {
@@ -99,17 +103,23 @@ export default function Home() {
               className={styles.inputjob}
               onChange={(e) => setJob(e.target.value)}
             />
-            <button className={styles.button} onClick={handleAddJob}>
-              Add New Job
-            </button>
+            {editMode ? (
+              <button className={styles.button} onClick={handleUpdateJob}>
+                Update
+              </button>
+            ) : (
+              <button className={styles.button} onClick={handleAddJob}>
+                Add New Job
+              </button>
+            )}
           </div>
 
           <div className={styles.listjob}>
             <ul>
-              {showJobs.map((todo) => (
+              {showJobs.map((todo, index) => (
                 <span>
                   <li
-                    key={todo.id}
+                    key={index}
                     style={{
                       textDecoration: todo.iscompleted
                         ? "line-through"
@@ -127,24 +137,26 @@ export default function Home() {
                     >
                       {todo.job}
                     </span>
-                    <span style={{paddingLeft: 15}}>
+                    <span style={{ paddingLeft: 15 }}>
                       <button
                         className={styles.secondarybutton}
-                        onClick={() => handleDeleteJob(todo.id)}
+                        onClick={() => handleDeleteJob(index)}
                       >
                         Detele
                       </button>
+
                       <button
                         className={styles.secondarybutton}
-                        onClick={() => handleDone(todo.id)}
+                        onClick={() => handleDone(index)}
                       >
                         Finish
                       </button>
+
                       <button
                         className={styles.secondarybutton}
-                        onClick={() => handleUpdateJob(todo.id)}
+                        onClick={() => handleShowEdit(todo, index)}
                       >
-                        Update
+                        Edit
                       </button>
                     </span>
                   </li>
@@ -159,6 +171,9 @@ export default function Home() {
             </button>
             <button className={styles.button} onClick={handleDeteleNotDone}>
               Detele Unfinish Job
+            </button>
+            <button className={styles.button} onClick={handleCompleteAll}>
+              Complete All 
             </button>
           </div>
 
