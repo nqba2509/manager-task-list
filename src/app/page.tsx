@@ -24,8 +24,10 @@ export default function Home() {
 
   const handleDeleteJob = (index: number) => {
     let updataTodos = [...todos];
-    updataTodos.slice(index, 1);
-    setTodos(updataTodos);
+    if(index >= 0 && index < updataTodos.length) {
+      updataTodos.slice(index,1)
+    }
+    setTodos(updataTodos)
   };
 
   const handleDone = (index: number) => {
