@@ -24,11 +24,11 @@ export default function Home() {
 
   const handleDeleteJob = (index: number) => {
     let updataTodos = [...todos];
-    if(index >= 0 && index < updataTodos.length) {
-      updataTodos.splice(index,1)
+    if (index >= 0 && index < updataTodos.length) {
+      updataTodos.splice(index, 1);
     }
-    setTodos(updataTodos)
-    console.log(updataTodos)
+    setTodos(updataTodos);
+    console.log(updataTodos);
   };
 
   const handleDone = (index: number) => {
@@ -61,30 +61,36 @@ export default function Home() {
     setTodos(deteleNotDone);
   };
 
-
   const handleShowEdit = (todo: Todo, index: number) => {
     setJob(todo.job);
     setEditMode(true);
     setEditIndex(index);
   };
 
-
   const handleUpdateJob = () => {
     let updateTodos = [...todos];
     updateTodos[editIndex] = { ...updateTodos[editIndex], job: job };
     setTodos(updateTodos);
-    setJob('')
-    setEditMode(false)
-    setEditIndex(0)
+    setJob("");
+    setEditMode(false);
+    setEditIndex(0);
   };
 
   const handleCompleteAll = () => {
     const completeAllJob = [...todos];
-    for(let i = 0; i < completeAllJob.length; i++) {
+    for (let i = 0; i < completeAllJob.length; i++) {
       completeAllJob[i] = { ...completeAllJob[i], iscompleted: true };
     }
-    setTodos(completeAllJob)
-  }
+    setTodos(completeAllJob);
+  };
+
+  const handleUndoJobDone = () => {
+    const undoJobDone = [...todos];
+    for (let i = 0; i < undoJobDone.length; i++) {
+      undoJobDone[i] = { ...undoJobDone[i], iscompleted: false };
+    }
+    setTodos(undoJobDone);
+  };
 
   let showJobs = todos;
   if (selectJob === "done") {
@@ -169,14 +175,17 @@ export default function Home() {
           </div>
 
           <div>
+            <button className={styles.button} onClick={handleCompleteAll}>
+              Complete All
+            </button>
+            <button className={styles.button} onClick={handleUndoJobDone}>
+              Undo Complete
+            </button>
             <button className={styles.button} onClick={handleDeteleDoneJob}>
-              Detele Finish Job
+              Detele Finish
             </button>
             <button className={styles.button} onClick={handleDeteleNotDone}>
-              Detele Unfinish Job
-            </button>
-            <button className={styles.button} onClick={handleCompleteAll}>
-              Complete All 
+              Detele Unfinish
             </button>
           </div>
 
